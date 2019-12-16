@@ -8,15 +8,6 @@ import static java.time.LocalDate.now;
 public class GeneratorMain {
     public static void main(String[] args) {
 
-        //заглушка консоли
-        args = new String[6];
-        args [0] = "offices.txt";
-        args [1] = "1000";
-        args [2] = "f1";
-        args [3] = "f2";
-        args [4] = "f3";
-        args [5] = "f4";
-
         // Определение входных условий задачи
         BigDecimal MIN = new BigDecimal("10000.12");
         BigDecimal MAX = new BigDecimal("100000.50");
