@@ -1,40 +1,32 @@
 package taskOne;
 
-import java.io.BufferedReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import common.TransactionInputParameters;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import static java.time.LocalDate.now;
 
 public class GeneratorMain {
     public static void main(String[] args) {
 
-        String line;
-        ArrayList<String> offices = new ArrayList();
-        int firstNumberOfTransactionInFile;
+        //заглушка консоли
+        args = new String[6];
+        args [0] = "offices.txt";
+        args [1] = "1000";
+        args [2] = "f1";
+        args [3] = "f2";
+        args [4] = "f3";
+        args [5] = "f4";
 
-        int numberOfFiles = args.length-2;
-        int totalNumberOfTransactions = Integer.parseInt(args[1]);
-        int remainder= totalNumberOfTransactions % numberOfFiles;
-        int numberPerOneFile = (totalNumberOfTransactions-remainder)/numberOfFiles;
-        DataGenerator [] dataGenerators = new DataGenerator[numberOfFiles];
+        // Определение входных условий задачи
+        BigDecimal MIN = new BigDecimal("10000.12");
+        BigDecimal MAX = new BigDecimal("100000.50");
+        LocalDate startDate = LocalDate.of(now().getYear()-1, 1, 1);
+        int dateRange = (LocalDate.now().getYear()%4 ==1)? 366:365;
 
-        try {
-            Path path = Paths.get("offices.txt");
-            BufferedReader reader = Files.newBufferedReader(path);
-            while((line = reader.readLine()) != null) {
-                offices.add(line);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        // Сделать чекер ввода из консоли
+        FilesGenerator filesGenerator = new FilesGenerator(args);
+        TransactionInputParameters transactionInputParameters = new TransactionInputParameters(startDate, dateRange, MIN, MAX, filesGenerator.parseOfficesList());
+        filesGenerator.generateAllFiles(transactionInputParameters);
 
-        for (int i = 0; i < numberOfFiles; i++) {
-            firstNumberOfTransactionInFile = numberPerOneFile;
-            if (i==numberOfFiles-1) numberPerOneFile += remainder;
-
-            dataGenerators[i] = new DataGenerator(args[i+2], numberPerOneFile);
-            dataGenerators[i].generateFile(offices, i*firstNumberOfTransactionInFile);
-        }
     }
 }
