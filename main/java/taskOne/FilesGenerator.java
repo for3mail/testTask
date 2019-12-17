@@ -2,13 +2,15 @@ package taskOne;
 
 import common.FileWithTransactions;
 import common.TransactionInputParameters;
-
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+
+/*Класс отвечает за поочередное создание файлов с транзакциями*/
 
 public class FilesGenerator {
     private String args [];

@@ -1,6 +1,6 @@
 package taskTwo;
 
-import java.io.BufferedReader;
+import common.Transaction;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.math.BigDecimal;
@@ -11,7 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Stream;
 
+/*Создает отчеты*/
 public class ReportGenerator {
 
     private TreeMap datesAnalyzer;
@@ -25,13 +27,17 @@ public class ReportGenerator {
     private FileChannel channel;
     private ByteBuffer buffer;
     private byte strBytes [];
-
-    private String line;
     private int temp;
     private String tempString;
     private TreeMap tempTree;
+    private Transaction transaction;
+
+    public interface Consumer<T> {
+        void accept(T t);
+    }
 
     public ReportGenerator(String datesReportFileName, String salesPointReportFileName, List listOfFiles) {
+        transaction = new Transaction();
         this.listOfFiles = listOfFiles;
         this.datesReportFileName = datesReportFileName;
         this.salesPointReportFileName = salesPointReportFileName;
@@ -41,21 +47,22 @@ public class ReportGenerator {
     }
 
     // Обрабатывает поочередно все исходные файлы и сохраняет результат в HashMap
-    public void generateAllReports(){
+    void generateAllReports(){
         for (int i = 0; i < listOfFiles.size(); i++) {
             analyzeOneDataFile(listOfFiles.get(i).toString());
         }
-
         sortSalesPointsReport();
         writeReportToFile(datesAnalyzer, datesReportFileName);
         writeReportToFile(sortedSalesPointsData, salesPointReportFileName);
     }
 
     // Добавляет в сумму одну транзакцию
-    void analyzeTransaction(LocalDate localDate, String salesPoint, BigDecimal amount){
+    private void analyzeTransaction(Transaction transaction){
+        LocalDate localDate = transaction.getLocalDate();
+        String salesPoint = transaction.getOffice();
+        BigDecimal amount = transaction.getTransactionAmount();
         if ((datesAnalyzer.get(localDate))==null) datesAnalyzer.put(localDate, new BigDecimal("0"));
         if ((salesPointAnalyzer.get(salesPoint))==null) salesPointAnalyzer.put(salesPoint, new BigDecimal("0"));
-
         datesAnalyzer.put(localDate, amount.add((BigDecimal)(datesAnalyzer.get(localDate))));
         salesPointAnalyzer.put(salesPoint, amount.add((BigDecimal)(salesPointAnalyzer.get(salesPoint))));
     }
@@ -88,23 +95,25 @@ public class ReportGenerator {
     }
 
     // Читает и обрабатывает один файл с транзакциями
-    void analyzeOneDataFile(String fileName){
+    private void analyzeOneDataFile(String fileName) {
+        Consumer<String> streamedAnalyzer = x -> {
+            temp = 0;
+            for (String currentTransaction : x.split(" ")) {
+                currentRecords[temp] = currentTransaction;
+                temp++;
+            }
+            transaction.setLocalDate(LocalDate.parse(currentRecords[0]));
+            transaction.setOffice(currentRecords[2]);
+            transaction.setTransactionAmount(new BigDecimal(currentRecords[4]));
+            analyzeTransaction(transaction);
+        };
         try {
             Path path = Paths.get(fileName);
-            BufferedReader reader = Files.newBufferedReader(path);
-            while((line = reader.readLine()) != null) {
-                temp = 0;
-                for (String currentTransaction : line.split(" ")) {
-                    currentRecords[temp] = currentTransaction;
-                    temp++;
-                }
-                analyzeTransaction(LocalDate.parse(currentRecords[0]), currentRecords[2], new BigDecimal(currentRecords[4]));
-            }
-
-        } catch (Exception e){
+            Stream<String> streamOfStrings = Files.lines(path);
+            streamOfStrings.forEach(s -> streamedAnalyzer.accept(s));
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     // сортирует продажи по точкам продаж по убыванию суммы
@@ -122,40 +131,5 @@ public class ReportGenerator {
             Map.Entry mapElement2 = (Map.Entry)hmIterator2.next();
             sortedSalesPointsData.put(mapElement2.getValue(), mapElement2.getKey());
         }
-
     }
-
- // Переделать сортировку через stream()
-    void sortReport1(){
-/*
-
-        Map<BigDecimal,String> sortedNewMap = salesPointAnalyzer.entrySet().stream().sorted((e1,e2)->
-                e1.getValue().getLocation().compareTo(e2.getValue().getLocation()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e1, LinkedHashMap::new))
-
-
-            salesPointAnalyzer.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue())
-                .forEach(addToFile());
-
-        Stream<String> stringStream=  salesPointAnalyzer.entrySet().parallelStream()
-                .sorted(Map.Entry.comparingByValue());
-        stringStream.
-        Files.write(Paths.get("/tmp/numbers.txt"),
-                (Iterable<String>)stringStream.
-                        mapToObj(String::valueOf)::iterator);
-
-        Iterable<String> iterable = stream::iterator;
-
-        Map sortedSalesPointReport =
-                .collect(Collectors.toMap(
-                Map.Entry::getKey, Map.Entry::getValue,
-                (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-
-*/
-
-    }
-
 }

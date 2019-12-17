@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-    class Transaction {
+    public class Transaction {
     private StringBuilder stringBuilder;
     private String transactionToString;
     private static int transactionNumber;
@@ -13,11 +13,35 @@ import java.time.LocalTime;
     private LocalTime localTime;
     private String office;
 
-    Transaction() {
+    public Transaction() {
         stringBuilder = new StringBuilder();
     }
 
-    // Генерация случайной транзакции
+        public void setTransactionAmount(BigDecimal transactionAmount) {
+            this.transactionAmount = transactionAmount;
+        }
+
+        public void setLocalDate(LocalDate localDate) {
+            this.localDate = localDate;
+        }
+
+        public void setOffice(String office) {
+            this.office = office;
+        }
+
+        public BigDecimal getTransactionAmount() {
+            return transactionAmount;
+        }
+
+        public LocalDate getLocalDate() {
+            return localDate;
+        }
+
+        public String getOffice() {
+            return office;
+        }
+
+        // Генерация случайной транзакции
     synchronized Transaction generateRandomTransaction(TransactionInputParameters inputParameters){
         localDate = inputParameters.getStartDate().plusDays((long)(Math.random()*inputParameters.getDateRange()));
         localTime = LocalTime.of(0,0,0).plusSeconds((long)(Math.random()*86400));

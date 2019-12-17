@@ -5,6 +5,9 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+
+/* Класс отвечает за генерацию одного файла с транзакциями*/
+
 public class FileWithTransactions {
     private String fileName;
     private int totalNumberOfTransactions;

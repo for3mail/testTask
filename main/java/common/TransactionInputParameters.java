@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-// именования переменных
+/*Отвечает за хранение параметров случайной транзакции*/
 public  class TransactionInputParameters {
     private LocalDate startDate;
     private int DateRange;
