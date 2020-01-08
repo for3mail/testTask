@@ -16,7 +16,6 @@ public class FilesGeneratorTest {
         filesGenerator = new FilesGenerator(args);
     }
     @Test
-    @DisplayName("Testing how file with offices is parsing")
     void parseOfficesListTest(){
         ArrayList<String> expectedList = new ArrayList<String>(Arrays.asList("a1","b2","c3", "d4"));
         Assertions.assertIterableEquals(expectedList, filesGenerator.parseOfficesList());

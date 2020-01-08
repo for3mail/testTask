@@ -24,11 +24,11 @@ public  class TransactionInputParameters {
         this.offices = offices;
     }
 
-    public LocalDate getStartDate() {
+    LocalDate getStartDate() {
         return startDate;
     }
 
-    public int getDateRange() {
+    int getDateRange() {
         return DateRange;
     }
 
@@ -36,15 +36,15 @@ public  class TransactionInputParameters {
         return MAX;
     }
 
-    public BigDecimal getMIN() {
+    BigDecimal getMIN() {
         return MIN;
     }
 
-    public BigDecimal getRANGE() {
+    BigDecimal getRANGE() {
         return RANGE;
     }
 
-    public List<String> getOffices() {
+    List<String> getOffices() {
         return offices;
     }
 }
