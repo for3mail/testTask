@@ -12,20 +12,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 public class FileWithTransactionsTest {
     private FileWithTransactions fileWithTransactions;
     private TransactionInputParameters transactionInputParameters;
-    private Transaction transaction;
     private String [] currentRecords;
 
     @Test
     void generateFileTest() {
-        String fileName = "testFileName";
+        String fileName = "testDir/generatorTest2";
         currentRecords = new String[5];
-        HashMap<Integer, Integer> uniqTransactions = new HashMap<>();
-        transaction = new Transaction();
+        HashSet<Integer> uniqueTransactions = new HashSet<>();
         ArrayList<String> officesArray = new ArrayList<>(Arrays.asList("office1","office2","office3", "office4"));
         transactionInputParameters = new TransactionInputParameters(
                 LocalDate.of(2019,01,01),
@@ -34,19 +33,19 @@ public class FileWithTransactionsTest {
                 BigDecimal.valueOf(100000.50),
                 officesArray);
         fileWithTransactions = new FileWithTransactions(fileName, 100, transactionInputParameters);
-
         fileWithTransactions.generateFile();
-        Assertions.assertTrue(Files.exists(Paths.get("testFileName")));
-
+        Assertions.assertTrue(Files.exists(Paths.get(fileName)));
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
             Stream<String> streamOfStrings = bufferedReader.lines();
             streamOfStrings.forEach(s -> {
                 currentRecords = s.split(" ", 5);
-
                 Assertions.assertTrue(LocalDate.parse(currentRecords[0]).toEpochDay() >=17897
                                 && LocalDate.parse(currentRecords[0]).toEpochDay()<18262);
-                // проверить уникальность транзакций
+                Assertions.assertFalse(uniqueTransactions.contains(Integer.parseInt(currentRecords[3])),
+                        "не уникальный номер" + String.valueOf(Integer.parseInt(currentRecords[3])));
+                Assertions.assertFalse(uniqueTransactions.contains(Integer.parseInt(currentRecords[3])));
+                uniqueTransactions.add(Integer.parseInt(currentRecords[3]));
                 Assertions.assertTrue(new BigDecimal(currentRecords[4]).compareTo(new BigDecimal(10000.12))>0);
                 Assertions.assertTrue(new BigDecimal(currentRecords[4]).compareTo(new BigDecimal(100000.50))<0);
             });
